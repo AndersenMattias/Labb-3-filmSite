@@ -1,5 +1,5 @@
-const searchBar = document.getElementById("searchBar");
 const results = document.getElementById("results");
+const searchBar = document.getElementById("searchBar");
 const movieInfo = document.getElementById("movieInfo");
 const moviePoster = document.getElementById("moviePoster");
 
@@ -48,70 +48,108 @@ const navigation = (e) => {
   }
 };
 
-const createDropdown = (data) => {
+const createMovieList = (data) => {
   selectedMovie = -1;
+  results.innerHTML = "";
   if (data.Search) {
-    results.innerHTML = `<ul class="moviesList" id="moviesList"></ul>`;
-
     for (let i = 0; i < data.Search.length; i++) {
       const element = data.Search[i];
-      moviesList.innerHTML += `<li class="movie" onclick="getSingleMovie('${element.imdbID}')">${element.Title}</li> `;
-      if (i === 9) {
+      if (i > 9) {
         return;
       }
+      if (element.Poster === "N/A") {
+        results.innerHTML += `<div class="movie" id="movie${
+          i + 1
+        }" onclick="toggleMovieSummary(${
+          i + 1
+        })"><div class="image noPosterAvailable" ><p class="noPosterText" >No Poster Available</p></div><div id="movie${
+          i + 1
+        }InfoList" class="movieInfoList"></div></div>`;
+        console.log(i);
+      } else {
+        results.innerHTML += `<div class="movie" id="movie${
+          i + 1
+        }" onclick="toggleMovieSummary(${
+          i + 1
+        })"><div class="image" ><img src="${
+          element.Poster
+        }"></img></div><div id="movie${
+          i + 1
+        }InfoList" class="movieInfoList"></div></div>`;
+        console.log(i);
+      }
+      getMovieSummary(element.imdbID, i + 1);
     }
   } else {
-    results.innerHTML = `<ul class="moviesList" id="moviesList"></ul>`;
-    moviesList.innerHTML = `<li class="error">${data.Error}</li>`;
+    results.innerHTML = `<div class="error">No movies matched your search, try again!</div>`;
   }
 };
 
-const createMovieInfo = (data) => {
-  results.innerHTML = "";
-  searchBar.value = "";
-  movieInfo.innerHTML = `
-  <ul id="movieInfoList"></ul>`;
-  let movieInfoList = document.getElementById("movieInfoList");
-  movieInfoList.innerHTML += `<img src="${data.Poster}"></img>`;
-  for (let i = 0; i < Object.keys(data).length; i++) {
-    if (Object.keys(data)[i] === "Poster") {
-      ("");
-    } else if (Object.keys(data)[i] === "Ratings") {
-      for (let j = 0; j < Object.values(data)[i].length; j++) {
-        console.log(Object.values(data)[i][j]);
-        movieInfoList.innerHTML += `<li>${Object.keys(data)[i]}: ${
-          Object.values(data)[i][j].Source
-        }: ${Object.values(data)[i][j].Value}
-        </li>`;
-      }
-
-      // Fix ratings
-    } else {
-      movieInfoList.innerHTML += `<li>${Object.keys(data)[i]}: ${
-        Object.values(data)[i]
-      } </li>`;
-    }
-  }
+const createMovieSummary = (data, movieID) => {
+  let movieInfoList = document.getElementById(`movie${movieID}InfoList`);
+  movieInfoList.innerHTML += `
+  <p class="title">Title: ${data.Title} <img src="./times-solid.svg" class="times" ></img></p>
+  <p class="info">Year: ${data.Year}</p>
+  <p class="info">Genre: ${data.Genre}</p>
+  <p class="info">Summary: ${data.Plot}</p>
+  <p class="info">Runtime: ${data.Runtime}</p>
+  <p class="imdbRating">IMDB Rating:  ${data.imdbRating}💩</p>
+  <a class="viewMore" target="_blank" href="https://www.imdb.com/title/${data.imdbID}/">View more..</a>
+  `;
 };
+
+const toggleMovieSummary = (movieID) => {
+  let movieInfoList = document.getElementById(`movie${movieID}InfoList`);
+
+  movieInfoList.classList.toggle("showInfo");
+};
+
+// const createMovieInfo = (data) => {
+//   results.innerHTML = "";
+//   searchBar.value = "";
+//   movieInfo.innerHTML = `
+//   <div id="movieInfoList"></div>`;
+//   let movieInfoList = document.getElementById("movieInfoList");
+//   movieInfoList.innerHTML += `<img src="${data.Poster}"></img>`;
+//   for (let i = 0; i < Object.keys(data).length; i++) {
+//     if (Object.keys(data)[i] === "Poster") {
+//       ("");
+//     } else if (Object.keys(data)[i] === "Ratings") {
+//       for (let j = 0; j < Object.values(data)[i].length; j++) {
+//         console.log(Object.values(data)[i][j]);
+//         movieInfoList.innerHTML += `<div>${Object.keys(data)[i]}: ${
+//           Object.values(data)[i][j].Source
+//         }: ${Object.values(data)[i][j].Value}
+//         </div>`;
+//       }
+
+//       // Fix ratings
+//     } else {
+//       movieInfoList.innerHTML += `<div>${Object.keys(data)[i]}: ${
+//         Object.values(data)[i]
+//       } </div>`;
+//     }
+//   }
+// };
 
 const loadMovies = async (letters) => {
   try {
     await fetch(`http://www.omdbapi.com/?s=${letters}&apikey=${apikey}`)
       .then((response) => response.json())
       .then((data) => {
-        createDropdown(data);
+        createMovieList(data);
       });
   } catch (err) {
     console.log(err);
   }
 };
 
-const getSingleMovie = async (imdbID) => {
+const getMovieSummary = async (imdbID, movieID) => {
   try {
     await fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=${apikey}`)
       .then((response) => response.json())
       .then((data) => {
-        createMovieInfo(data);
+        createMovieSummary(data, movieID);
       });
   } catch (err) {
     console.log(err);
