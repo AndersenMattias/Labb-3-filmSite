@@ -1,24 +1,24 @@
-const results = document.getElementById('results');
-const searchBar = document.getElementById('searchBar');
-const movieInfo = document.getElementById('movieInfo');
-const moviePoster = document.getElementById('moviePoster');
+const results = document.getElementById("results");
+const searchBar = document.getElementById("searchBar");
+const movieInfo = document.getElementById("movieInfo");
+const moviePoster = document.getElementById("moviePoster");
 
-const apikey = '3be400a5';
+const apikey = "3be400a5";
 
-searchBar.addEventListener('keyup', (e) => {
-  if (e.key == 'ArrowDown') {
-    navigation('ArrowDown');
-  } else if (e.key == 'ArrowUp') {
-    navigation('ArrowUp');
-  } else if (e.key == 'Enter') {
-    navigation('Enter');
+searchBar.addEventListener("keyup", (e) => {
+  if (e.key == "ArrowDown") {
+    navigation("ArrowDown");
+  } else if (e.key == "ArrowUp") {
+    navigation("ArrowUp");
+  } else if (e.key == "Enter") {
+    navigation("Enter");
   } else {
     if (searchBar.value.length > 2) {
       let letters = searchBar.value;
       loadMovies(letters);
     }
     if (searchBar.value.length < 3) {
-      results.innerHTML = '';
+      results.innerHTML = "";
     }
   }
 });
@@ -26,38 +26,38 @@ searchBar.addEventListener('keyup', (e) => {
 let selectedMovie = -1;
 
 const navigation = (e) => {
-  let allMovies = Array.from(document.querySelectorAll('.movie'));
+  let allMovies = Array.from(document.querySelectorAll(".movie"));
 
-  if (e === 'ArrowDown') {
+  if (e === "ArrowDown") {
     if (selectedMovie >= 0) {
-      allMovies[selectedMovie].classList.remove('selected');
+      allMovies[selectedMovie].classList.remove("selected");
     }
     selectedMovie = (selectedMovie + 1) % allMovies.length;
-    allMovies[selectedMovie].classList.add('selected');
-  } else if (e === 'ArrowUp') {
+    allMovies[selectedMovie].classList.add("selected");
+  } else if (e === "ArrowUp") {
     if (selectedMovie < 10 && selectedMovie >= 0) {
-      allMovies[selectedMovie].classList.remove('selected');
+      allMovies[selectedMovie].classList.remove("selected");
     }
     selectedMovie = (selectedMovie - 1) % allMovies.length;
     if (selectedMovie < 0) {
       selectedMovie = 9;
     }
-    allMovies[selectedMovie].classList.add('selected');
-  } else if (e === 'Enter') {
+    allMovies[selectedMovie].classList.add("selected");
+  } else if (e === "Enter") {
     allMovies[selectedMovie].onclick();
   }
 };
 
 const createMovieList = (data) => {
   selectedMovie = -1;
-  results.innerHTML = '';
+  results.innerHTML = "";
   if (data.Search) {
     for (let i = 0; i < data.Search.length; i++) {
       const element = data.Search[i];
       if (i > 9) {
         return;
       }
-      if (element.Poster === 'N/A') {
+      if (element.Poster === "N/A") {
         results.innerHTML += `<div class="movie" id="movie${
           i + 1
         }" onclick="toggleMovieSummary(${
@@ -87,7 +87,7 @@ const createMovieList = (data) => {
 
 const createMovieSummary = (data, movieID) => {
   let movieInfoList = document.getElementById(`movie${movieID}InfoList`);
-  movieInfoList.innerHTML += `
+  movieInfoList.innerHTML = `
   <p class="title">Title: ${data.Title} <img src="./times-solid.svg" class="times" ></img></p>
   <p class="info">Year: ${data.Year}</p>
   <p class="info">Genre: ${data.Genre}</p>
@@ -101,36 +101,8 @@ const createMovieSummary = (data, movieID) => {
 const toggleMovieSummary = (movieID) => {
   let movieInfoList = document.getElementById(`movie${movieID}InfoList`);
 
-  movieInfoList.classList.toggle('showInfo');
+  movieInfoList.classList.toggle("showInfo");
 };
-
-// const createMovieInfo = (data) => {
-//   results.innerHTML = "";
-//   searchBar.value = "";
-//   movieInfo.innerHTML = `
-//   <div id="movieInfoList"></div>`;
-//   let movieInfoList = document.getElementById("movieInfoList");
-//   movieInfoList.innerHTML += `<img src="${data.Poster}"></img>`;
-//   for (let i = 0; i < Object.keys(data).length; i++) {
-//     if (Object.keys(data)[i] === "Poster") {
-//       ("");
-//     } else if (Object.keys(data)[i] === "Ratings") {
-//       for (let j = 0; j < Object.values(data)[i].length; j++) {
-//         console.log(Object.values(data)[i][j]);
-//         movieInfoList.innerHTML += `<div>${Object.keys(data)[i]}: ${
-//           Object.values(data)[i][j].Source
-//         }: ${Object.values(data)[i][j].Value}
-//         </div>`;
-//       }
-
-//       // Fix ratings
-//     } else {
-//       movieInfoList.innerHTML += `<div>${Object.keys(data)[i]}: ${
-//         Object.values(data)[i]
-//       } </div>`;
-//     }
-//   }
-// };
 
 const loadMovies = async (letters) => {
   try {
